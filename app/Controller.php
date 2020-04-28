@@ -33,6 +33,7 @@ class Controller
 
     private function index()
     {
+        $user = Model::find('id', 2);
         $this->render('index', ['user' => 'test']);
     }
 

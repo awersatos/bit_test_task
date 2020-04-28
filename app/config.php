@@ -7,5 +7,6 @@ return [
         'user' => 'test',
         'password' => 'test',
     ],
-    'layout' => 'views/layout.php'
+    'layout' => 'views/layout.php',
+    'salt' => 'ljfvkejevkhewuih',
 ];
