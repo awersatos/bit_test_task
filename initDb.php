@@ -13,7 +13,7 @@ $sql = 'CREATE TABLE IF NOT EXISTS users (
             password VARCHAR (255) NOT NULL,
             balance FLOAT,
             PRIMARY KEY ( id )
-)';
+) ENGINE = InnoDB';
 
 $conn->exec($sql);
 

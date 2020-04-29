@@ -33,35 +33,58 @@ class Controller
 
     private function index()
     {
+        $message = '';
         session_start();
         session_write_close();
-        if(isset($_SESSION['id'])) {
+        if (isset($_SESSION['id'])) {
             $user = Model::find('id', $_SESSION['id']);
+            if (!$user) {
+                header('HTTP/1.0 404 not found');
+                exit('Пользователь не найден');
+            }
+
+            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                $amount = (float)$_POST['amount'];
+                if ($amount && $amount > 0) {
+                    $balance = (float)$user->balance;
+                    if ($balance >= $amount) {
+                        if($user->withdrawFunds($amount)) {
+                            $message = ['type' => 'success', 'text' => 'Успешно выполнено'];
+                        } else {
+                            $message = ['type' => 'error', 'text' => 'Ошибка транзакции'];
+                        }
+                    } else {
+                        $message = ['type' => 'error', 'text' => 'Недостаточно средств'];
+                    }
+                } else {
+                    $message = ['type' => 'error', 'text' => 'Некорректная сумма'];
+                }
+            }
         } else {
             header('Location: /login');
             exit();
         }
-        $this->render('index', ['user' => $user->name]);
+        $this->render('index', ['user' => $user, 'message' => $message]);
     }
 
     private function login()
     {
         $error = '';
 
-        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $name = $_POST['name'];
             $password = $_POST['password'];
             $user = Model::find('name', $name);
-            if($user) {
-                 if($user->checkPassword($password)) {
-                     session_start();
-                     $_SESSION['id'] = $user->id;
-                     session_write_close();
-                     header('Location: /');
-                     exit();
-                 } else {
-                     $error = 'Неверный пароль';
-                 }
+            if ($user) {
+                if ($user->checkPassword($password)) {
+                    session_start();
+                    $_SESSION['id'] = $user->id;
+                    session_write_close();
+                    header('Location: /');
+                    exit();
+                } else {
+                    $error = 'Неверный пароль';
+                }
             } else {
                 $error = 'Пользователь не найден';
             }
