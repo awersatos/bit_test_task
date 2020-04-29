@@ -43,7 +43,9 @@ class Model
 
     public function withdrawFunds($amount)
     {
+        //Устанавливаем самый высокий уровень изоляции транзакций
         $this->conn->exec('SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+
         try {
             $this->conn->beginTransaction();
             $ballData = $this->conn->query("SELECT balance FROM users WHERE id={$this->id}")

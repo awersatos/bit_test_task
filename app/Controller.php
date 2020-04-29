@@ -49,15 +49,15 @@ class Controller
                     $balance = (float)$user->balance;
                     if ($balance >= $amount) {
                         if($user->withdrawFunds($amount)) {
-                            $message = ['type' => 'success', 'text' => 'Успешно выполнено'];
+                            header('Location: /', true, 303);
                         } else {
-                            $message = ['type' => 'error', 'text' => 'Ошибка транзакции'];
+                            $message = 'Ошибка транзакции';
                         }
                     } else {
-                        $message = ['type' => 'error', 'text' => 'Недостаточно средств'];
+                        $message = 'Недостаточно средств';
                     }
                 } else {
-                    $message = ['type' => 'error', 'text' => 'Некорректная сумма'];
+                    $message = 'Некорректная сумма';
                 }
             }
         } else {
