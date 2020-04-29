@@ -34,4 +34,10 @@ class Model
 
         return $model;
     }
+
+    public function checkPassword($password)
+    {
+        $salt = $this->config['salt'];
+        return md5($salt . $password) == $this->password;
+    }
 }

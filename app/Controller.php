@@ -33,18 +33,48 @@ class Controller
 
     private function index()
     {
-        $user = Model::find('id', 2);
-        $this->render('index', ['user' => 'test']);
+        session_start();
+        session_write_close();
+        if(isset($_SESSION['id'])) {
+            $user = Model::find('id', $_SESSION['id']);
+        } else {
+            header('Location: /login');
+            exit();
+        }
+        $this->render('index', ['user' => $user->name]);
     }
 
     private function login()
     {
-        $this->render('index', ['user' => 'login']);
+        $error = '';
+
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $name = $_POST['name'];
+            $password = $_POST['password'];
+            $user = Model::find('name', $name);
+            if($user) {
+                 if($user->checkPassword($password)) {
+                     session_start();
+                     $_SESSION['id'] = $user->id;
+                     session_write_close();
+                     header('Location: /');
+                     exit();
+                 } else {
+                     $error = 'Неверный пароль';
+                 }
+            } else {
+                $error = 'Пользователь не найден';
+            }
+        }
+
+        $this->render('login', ['error' => $error]);
     }
 
     private function logout()
     {
-        $this->render('index', ['user' => 'logout']);
+        session_start();
+        session_destroy();
+        header('Location: /login');
     }
 
     private function render($view, array $data = [])
